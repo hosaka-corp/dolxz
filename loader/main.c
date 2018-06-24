@@ -174,7 +174,7 @@ void _main()
 #if defined(HIGH)
 	u32 inPos = 0x81320000;
 #elif defined(LOW)
-	u32 inPos = 0x80020000;
+	u32 inPos = 0x81020000;
 #endif
 	b.in = (void*)inPos;
 	pHex(*(vu32*)b.in);
@@ -183,11 +183,9 @@ void _main()
 	
 #if defined(HIGH)
 	//start decompression at lowest MEM1 point
-#if defined(HW_RVL)
-	u32 outPos = 0x80003400;
-#elif defined(HW_DOL)
-	u32 outPos = 0x80003100;
-#endif
+	//u32 outPos = 0x80003100;
+	u32 outPos = 0x81000100;
+
 	//our loader comes above this
 	u32 maxOutSize = 0x81300000 - outPos;
 #elif defined(LOW)
@@ -203,14 +201,9 @@ void _main()
 	pHex(b.out_pos);
 	xz_dec_end(decStr);
 	//out_pos after decompress is uncompressed total
-#if defined(HW_DOL)
 	u32 aligned_out_size = ALIGN32(b.out_pos);
 	DCFlushRange((void*)outPos, aligned_out_size);
 	ar_dma(TO_ARAM, outPos, 0, aligned_out_size);
-#elif defined(HW_RVL)
-	memcpy(MEM2_start, (void*)outPos, b.out_pos);
-	DCFlushRange((void*)MEM2_start, b.out_pos);
-#endif
 	pChar('3');
 	//done with setup, start up dolloader
 	memcpy((void*)0x817C0000, dolloader, dolloader_size);

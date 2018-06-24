@@ -8,11 +8,10 @@
 #include <malloc.h>
 #include <lzma.h>
 #include <stdbool.h>
+#include <string.h>
+#include <errno.h>
 
 #include "loader/loader_cube.h"
-#include "loader/loader_cube_high.h"
-#include "loader/loader_wii.h"
-#include "loader/loader_wii_high.h"
 
 typedef struct _dolheader {
 	unsigned int text_pos[7];
@@ -102,12 +101,14 @@ static bool compress(lzma_stream *strm, FILE *infile, FILE *outfile)
 static void printusage()
 {
 	printf("Usage:\n"
-		"dolxz <in.dol> <out.dol> <system> <additional options>\n\n"
-		"Systems:\n"
-		"-cube - Create GameCube compatible DOL File\n"
-		"-wii - Create Wii compatible DOL File\n\n"
-		"Additional Options:\n"
-		"-high - Use 0x81300000 as Entrypoint instead of 0x80003100/0x80003400\n");
+		//"dolxz <in.dol> <out.dol> <system> <additional options>\n\n"
+		"dolxz <in.dol> <out.dol>\n\n"
+		"* Assumes entrypoint at 0x81000100\n");
+		//"Systems:\n"
+		//"-cube - Create GameCube compatible DOL File\n");
+		//"-wii - Create Wii compatible DOL File\n\n"
+		//"Additional Options:\n"
+		//"-high - Use 0x81300000 as Entrypoint instead of 0x80003100/0x80003400\n");
 }
 
 enum
@@ -124,20 +125,21 @@ static void parseCmds(int argc, char *argv[])
 	int i;
 	for(i = 1; i < argc; i++)
 	{
-		if(memcmp(argv[i],"-cube",6) == 0)
-			sysin = SYS_CUBE;
-		else if(memcmp(argv[i],"-wii",5) == 0)
-			sysin = SYS_WII;
-		else if(memcmp(argv[i],"-high",6) == 0)
-			high = 1;
+//		if(memcmp(argv[i],"-cube",6) == 0)
+//			sysin = SYS_CUBE;
+//		else if(memcmp(argv[i],"-wii",5) == 0)
+//			sysin = SYS_WII;
+//		else if(memcmp(argv[i],"-high",6) == 0)
+//			high = 1;
 	}
+	sysin = SYS_CUBE;
 }
 
 int main(int argc, char *argv[])
 {
 	printf("dolxz v1.2 by FIX94\n\n");
 
-	if(argc < 4)
+	if(argc < 3)
 	{
 		printusage();
 		return -1;
@@ -172,8 +174,8 @@ int main(int argc, char *argv[])
 		printf("Building GameCube DOL\n");
 		if(high)
 		{
-			loader_size = loader_cube_high_size;
-			loader_dol = loader_cube_high;
+			//loader_size = loader_cube_high_size;
+			//loader_dol = loader_cube_high;
 		}
 		else
 		{
@@ -186,16 +188,17 @@ int main(int argc, char *argv[])
 		printf("Building Wii DOL\n");
 		if(high)
 		{
-			loader_size = loader_wii_high_size;
-			loader_dol = loader_wii_high;
+			//loader_size = loader_wii_high_size;
+			//loader_dol = loader_wii_high;
 		}
 		else
 		{
-			loader_size = loader_wii_size;
-			loader_dol = loader_wii;
+			//loader_size = loader_wii_size;
+			//loader_dol = loader_wii;
 		}
 	}
-	unsigned int dolMemPos = 0x80020000;
+	//unsigned int dolMemPos = 0x80020000;
+	unsigned int dolMemPos = 0x81020000;
 	if(high)
 	{
 		printf("Using High Entrypoint\n");

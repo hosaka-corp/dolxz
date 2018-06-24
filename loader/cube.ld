@@ -17,7 +17,8 @@ PHDRS {
 }
 
 SECTIONS {
-	. = 0x80003100;
+	/*. = 0x80003100; */
+	. = 0x81000100;
 
 	.start : { *(.init) *(.init.*) } :app
 	.text : { *(.text) *(.text.*) } :app
@@ -30,7 +31,8 @@ SECTIONS {
 	.sdata : { *(.sdata) *(.sdata.*) } :dat
 	.rodata : { *(.rodata) *(.rodata.*) } :dat
 
-	. = 0x80020000;
+	/*. = 0x80020000;*/
+	. = 0x81020000;
 	.rodata1 : { *(.rodata1) } :dat2
 }
 

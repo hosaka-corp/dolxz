@@ -29,7 +29,11 @@ RANLIB = $(PREFIX)ranlib
 STRIP = $(PREFIX)strip
 
 MACHDEP = -mcpu=750 -mno-eabi -mhard-float -DHW_DOL=1
-CFLAGS = $(MACHDEP) -O2 -Werror -Wall
+
+# Errors? What errors?
+#CFLAGS = $(MACHDEP) -O2 -Werror -Wall
+
+CFLAGS = $(MACHDEP) -O2
 LDFLAGS = $(MACHDEP) -n -nostartfiles -nostdlib -Wl,-T,$(LDSCRIPT) -L.
 ASFLAGS = -DHW_DOL=1 -D_LANGUAGE_ASSEMBLY
 
@@ -46,29 +50,29 @@ all: $(TARGET)
 
 %.o: %.s
 	@echo " ASSEMBLE    $<"
-	@$(CC) $(CFLAGS) $(DEFINES) $(ASFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(DEFINES) $(ASFLAGS) -c $< -o $@
 
 %.o: %.S
 	@echo " ASSEMBLE    $<"
-	@$(CC) $(CFLAGS) $(DEFINES) $(ASFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(DEFINES) $(ASFLAGS) -c $< -o $@
 
 %.o: %.c
 	@echo " COMPILE     $<"
-	@$(CC) $(CFLAGS) $(DEFINES) -c $< -o $@
+	$(CC) $(CFLAGS) $(DEFINES) -c $< -o $@
 
-$(TARGET_LINKED): $(OBJS)
+loader.elf: $(OBJS)
 	@echo " LINK        $@"
-	@$(CC) -g -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
+	$(CC) -g -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
 
-$(TARGET_DOL): $(TARGET_LINKED)
+loader.dol: loader.elf
 	@echo " ELF2DOL     $@"
-	@elf2dol $< $@
+	elf2dol $< $@
 
-$(TARGET): $(TARGET_DOL)
+$(TARGET): loader.dol
 	@echo " BIN2H       $@"
-	@mv $< $(TARGET_TMP)
-	@$(BIN2H) $(TARGET_TMP)
-	@mv $(TARGET_TMP) $<
+	mv $< $(TARGET_TMP)
+	$(BIN2H) $(TARGET_TMP)
+	mv $(TARGET_TMP) $<
 
 clean:
-	rm -rf $(TARGET_LINKED) $(TARGET_DOL) $(TARGET) $(OBJS) $(DEPDIR)
+	rm -rf loader.elf loader.dol $(TARGET) $(OBJS) $(DEPDIR)

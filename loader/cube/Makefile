@@ -44,17 +44,36 @@ else
 	MAKEFLAGS += --no-print-directory
 endif
 
-all:
+#all:
+#	@echo "  ASSEMBLE  start.o"
+#	$(Q)$(CC) $(CFLAGS) -c start.S -o start.o
+#	@echo "  COMPILE   dolloader.o"
+#	$(Q)$(CC) $(CFLAGS) -c dolloader.c -o dolloader.o
+#	@echo "  LINK      dolloader.elf"
+#	$(Q)$(LD) start.o dolloader.o -T dolloader.ld -o dolloader.elf
+#	@echo "  OBJCOPY   dolloader.bin"
+#	$(Q)$(OBJCOPY) -Obinary dolloader.elf dolloader.bin
+#	@echo "  OUTPUT    dolloader.h"
+#	$(Q)$(BIN2H) dolloader.bin
+
+all: dolloader.h
+
+start.o:
 	@echo "  ASSEMBLE  start.o"
 	$(Q)$(CC) $(CFLAGS) -c start.S -o start.o
+dolloader.o: start.o
 	@echo "  COMPILE   dolloader.o"
 	$(Q)$(CC) $(CFLAGS) -c dolloader.c -o dolloader.o
+dolloader.elf: dolloader.o
 	@echo "  LINK      dolloader.elf"
 	$(Q)$(LD) start.o dolloader.o -T dolloader.ld -o dolloader.elf
+dolloader.bin: dolloader.elf
 	@echo "  OBJCOPY   dolloader.bin"
 	$(Q)$(OBJCOPY) -Obinary dolloader.elf dolloader.bin
+dolloader.h: dolloader.bin
 	@echo "  OUTPUT    dolloader.h"
 	$(Q)$(BIN2H) dolloader.bin
 
+.PHONY: clean
 clean:
 	-rm -f start.o dolloader.o dolloader.elf dolloader.bin dolloader.h
